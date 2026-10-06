@@ -8,7 +8,7 @@ interface VedikaContextValue {
 const VedikaContext = createContext<VedikaContextValue | null>(null);
 
 interface VedikaProviderProps {
-  /** Your Vedika API key (vk_live_* or vk_ent_*) */
+  /** Public placeholder when used in browsers through your authenticated server proxy. */
   apiKey: string;
   /** API base URL (defaults to https://api.vedika.io) */
   baseUrl?: string;
@@ -28,7 +28,7 @@ interface VedikaProviderProps {
  *
  * function App() {
  *   return (
- *     <VedikaProvider apiKey="vk_live_...">
+ *     <VedikaProvider apiKey="public-proxy-placeholder" baseUrl="https://app.example.com">
  *       <YourApp />
  *     </VedikaProvider>
  *   );

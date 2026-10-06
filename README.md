@@ -1,5 +1,22 @@
 # @vedika-io/react
 
+Keep the real Vedika API key on your server. `VedikaProvider` uses the credential-bearing JavaScript SDK, which accepts only `https://api.vedika.io` and loopback HTTP. It does not support a custom HTTPS proxy origin. Never pass a live key to browser code.
+
+For a deployed browser app, call your own authenticated app endpoint with `fetch`. Your server uses `VedikaClient` at its official default origin and adds the real key there. Authenticate the app session and allow only the API operations your app needs. The provider hooks below are suitable for a local loopback proxy with a public placeholder; they do not supply a production browser proxy transport.
+
+```ts
+// Browser: the app endpoint is supplied by your own server.
+const response = await fetch("/api/vastu/assessment", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  credentials: "same-origin",
+  body: JSON.stringify(assessment),
+});
+if (!response.ok) throw new Error("Assessment request failed");
+const result = await response.json();
+```
+
+
 React SDK for the [Vedika Intelligence API](https://vedika.io) -- hooks, provider, and utilities for astrology, tarot, numerology, and 20+ spiritual domains.
 
 ## Installation
@@ -8,16 +25,18 @@ React SDK for the [Vedika Intelligence API](https://vedika.io) -- hooks, provide
 npm install @vedika-io/react @vedika-io/sdk
 ```
 
-## Quick Start
+Requires `@vedika-io/sdk` 3.0.7 or newer.
 
-Wrap your app with `VedikaProvider` and use hooks anywhere inside:
+## Local Development
+
+Run an authenticated loopback proxy at `http://localhost:8080`. It must discard the public placeholder headers and attach the real key on the server. Then use the provider hooks:
 
 ```tsx
 import { VedikaProvider, useAskVedika, useBirthChart } from '@vedika-io/react';
 
 function App() {
   return (
-    <VedikaProvider apiKey="vk_live_...">
+    <VedikaProvider apiKey="public-proxy-placeholder" baseUrl="http://localhost:8080">
       <AstrologyChat />
     </VedikaProvider>
   );
@@ -55,8 +74,8 @@ function AstrologyChat() {
 
 ```tsx
 <VedikaProvider
-  apiKey="vk_live_..."       // Required -- your API key
-  baseUrl="https://api.vedika.io"  // Optional -- custom base URL
+  apiKey="public-proxy-placeholder" // Public proxy marker
+  baseUrl="http://localhost:8080" // Local authenticated development proxy
   language="en"              // Optional -- default response language
   timeout={60000}            // Optional -- request timeout in ms
 >
@@ -226,6 +245,8 @@ function MyComponent() {
   }
 }
 ```
+
+The hooks use the SDK's retry rules: a 402 (insufficient balance) and a 401 are never retried, a daily-limit 429 is never retried, and a billed POST is not repeated unless the API accepts an idempotency key for it. With `@vedika-io/sdk` 3.1.1 or newer the error also carries the API `code`, and `InsufficientCreditsError` carries `required`, `available` and `deficit`.
 
 ## TypeScript
 
