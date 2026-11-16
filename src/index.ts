@@ -60,5 +60,25 @@ export { useSuitableCareers, useCareerTiming } from './hooks/useCareer';
 // Daily hooks
 export { useDailyBundle, useDailyHoroscope } from './hooks/useDaily';
 
+// Room scan (WebView bridge, controller and hook)
+export { useRoomScan } from './useRoomScan';
+export type { UseRoomScan, UseRoomScanOptions } from './useRoomScan';
+export {
+  createRoomScanController,
+  parseRoomScanMessage,
+  resolveMergeScript,
+  rejectMergeScript,
+  ROOM_SCAN_BRIDGE_SCHEMA,
+} from './roomScan';
+export type {
+  RoomScanController,
+  RoomScanControllerOptions,
+  RoomScanSnapshot,
+  RoomScanPhase,
+  RoomScanMessage,
+  RoomScanCapture,
+  RoomScanApiClient,
+} from './roomScan';
+
 // Version
 export { VERSION } from './version';

@@ -1,6 +1,6 @@
 {
   "name": "@vedika-io/react",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "React SDK for Vedika Intelligence API — hooks, provider, and components for astrology, tarot, numerology, and 20+ spiritual domains",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -8,7 +8,8 @@
   "files": ["dist"],
   "scripts": {
     "build": "tsup src/index.ts --format cjs,esm --dts",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "test": "npm run build && node --test --experimental-strip-types tests/*.test.mjs"
   },
   "peerDependencies": {
     "react": ">=16.8.0",

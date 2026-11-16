@@ -194,6 +194,27 @@ Every hook returns `{ data, loading, error, fetch/ask/draw/cast/send, reset }`.
 | `useDailyBundle()` | All-in-one daily insights |
 | `useDailyHoroscope()` | Daily horoscope by sign |
 
+## Room scan
+
+`useRoomScan` drives a room scan that runs in a WebView page and uploads the finished capture to `POST /v2/astrology/vastu/ar/room-capture`. Use it inside `VedikaProvider`.
+
+```tsx
+import { useRoomScan } from '@vedika-io/react';
+
+function ScanScreen() {
+  const scan = useRoomScan();
+  // scan.snapshot.phase: idle | scanning | captured | uploading | uploaded | cancelled | unsupported | failed
+  return (
+    <WebView ref={scan.webViewRef} source={{ uri: scanPageUrl }} onMessage={scan.onMessage} />
+    // then: await scan.upload();
+  );
+}
+```
+
+`scanPageUrl` is the URL of the room-scan page your WebView loads. A scan the user closes before a capture exists is `cancelled`, a platform that cannot scan is `unsupported`, and every `upload()` retry of one capture reuses one idempotency key.
+
+`useRoomScan` uploads with the provider's client, so the key rule at the top of this page applies. In a deployed app, call `createRoomScanController({ client, inject })` with your own `client`, an object with one method, `vastuOperation(operation, params, { idempotencyKey })`, that calls your server. `parseRoomScanMessage`, `resolveMergeScript` and `rejectMergeScript` are the message helpers the controller uses.
+
 ## Accessing the Client Directly
 
 For advanced use cases, access the underlying `VedikaClient`:
@@ -246,7 +267,7 @@ function MyComponent() {
 }
 ```
 
-The hooks use the SDK's retry rules: a 402 (insufficient balance) and a 401 are never retried, a daily-limit 429 is never retried, and a billed POST is not repeated unless the API accepts an idempotency key for it. With `@vedika-io/sdk` 3.1.1 or newer the error also carries the API `code`, and `InsufficientCreditsError` carries `required`, `available` and `deficit`.
+The hooks use the SDK's retry rules: a 402 (insufficient balance) and a 401 are never retried, a daily-limit 429 is never retried, and a billed POST is not repeated unless the API accepts an idempotency key for it. With `@vedika-io/sdk` 3.1.2 or newer the error also carries the API `code`, and `InsufficientCreditsError` carries `required`, `available` and `deficit`.
 
 ## TypeScript
 
